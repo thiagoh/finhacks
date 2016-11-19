@@ -72,9 +72,15 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.engine('.hbs', exphbs({
   extname: '.hbs',
-  defaultLayout: 'layout'
+  defaultLayout: 'layout',
+  // Uses multiple partials dirs, templates in "shared/templates/" are shared
+  // with the client-side of the app (see below).
+  partialsDir: [
+    'views/partials/'
+  ]
 }));
 app.set('view engine', '.hbs');
+app.disable('view cache');
 
 app.use(expressStatusMonitor());
 app.use(compression());
