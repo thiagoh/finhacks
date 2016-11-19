@@ -70,7 +70,7 @@ app.set('views', path.join(__dirname, 'views'));
 // app.engine('handlebars', exphbs({defaultLayout: 'views'}));
 // app.set('view engine', 'handlebars');
 
-app.engine('.hbs', exphbs({
+var ExpressHandlebars = exphbs.create({
   extname: '.hbs',
   defaultLayout: 'layout',
   // Uses multiple partials dirs, templates in "shared/templates/" are shared
@@ -78,7 +78,16 @@ app.engine('.hbs', exphbs({
   partialsDir: [
     'views/partials/'
   ]
-}));
+});
+
+var hbs = ExpressHandlebars.engine;
+
+// console.log(exphbs.handlebars.compile);
+// console.log(handlebars.compile);
+// console.log(hbs.handlebars);
+// console.log(hbs.handlebars.compile);
+
+app.engine('.hbs', hbs);
 app.set('view engine', '.hbs');
 app.disable('view cache');
 
@@ -106,6 +115,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+
 app.use((req, res, next) => {
   if (req.path === '/api/upload') {
     next();
@@ -115,6 +125,12 @@ app.use((req, res, next) => {
 });
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
+app.use(lusca.p3p('ABCDEF'));
+app.use(lusca.hsts({
+  maxAge: 31536000
+}));
+app.use(lusca.nosniff());
+
 app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
@@ -140,7 +156,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 /**
  * Primary app routes.
  */
-app.get('/', homeController.index);
+app.get('/', homeController.index(app, ExpressHandlebars));
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
