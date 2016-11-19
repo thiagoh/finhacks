@@ -1,0 +1,23 @@
+{
+  "name": "finhack",
+  "description": "Finhack solution",
+  "main": "",
+  "authors": [
+    "Thiago Andrade"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/js/bc",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.4",
+    "bootstrap": "^3.3.7",
+    "highcharts": "^5.0.3"
+  }
+}
