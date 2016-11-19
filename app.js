@@ -70,7 +70,9 @@ app.set('views', path.join(__dirname, 'views'));
 // app.engine('handlebars', exphbs({defaultLayout: 'views'}));
 // app.set('view engine', 'handlebars');
 
-var ExpressHandlebars = exphbs.create({
+
+
+var defaultOptions = {
   extname: '.hbs',
   defaultLayout: 'layout',
   // Uses multiple partials dirs, templates in "shared/templates/" are shared
@@ -78,9 +80,13 @@ var ExpressHandlebars = exphbs.create({
   partialsDir: [
     'views/partials/'
   ]
-});
-
+};
+var ExpressHandlebars = exphbs.create(defaultOptions);
 var hbs = ExpressHandlebars.engine;
+
+defaultOptions.partials = Promise.resolve({
+  jsIncludes: ExpressHandlebars.handlebars.compile('')
+});
 
 // console.log(exphbs.handlebars.compile);
 // console.log(handlebars.compile);
