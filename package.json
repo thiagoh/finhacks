@@ -1,10 +1,10 @@
 {
-  "name": "Finhack",
+  "name": "Finhacks",
   "version": "0.1.0",
-  "description": "Finhack solution",
+  "description": "Finhacks solution",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thiagoh/finhack.git"
+    "url": "https://github.com/thiagoh/finhacks.git"
   },
   "author": "Thiago Andrade",
   "license": "MIT",
