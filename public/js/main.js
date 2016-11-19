@@ -3,8 +3,9 @@ $(function() {
 	'use strict';
 
 	console.log('print chart');
-	
-	Highcharts.Chart('container', {
+
+	// Build the chart
+	Highcharts.chart('container', {
 		chart: {
 			plotBackgroundColor: null,
 			plotBorderWidth: null,
