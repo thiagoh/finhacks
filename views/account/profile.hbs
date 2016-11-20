@@ -2,7 +2,7 @@
   <h3>Profile Information</h3>
 </div>
 <form action="/account/profile" method="POST" class="form-horizontal">
-  <input type="hidden" name="_csrf" value={{_csrf}}/>
+  <input type="hidden" name="_csrf" value={{_csrf}} />
   <div class="form-group">
     <label for="email" class="col-sm-3 control-label">Email</label>
     <div class="col-sm-7">
@@ -19,13 +19,13 @@
     <label class="col-sm-3 control-label">Gender</label>
     <div class="col-sm-6">
       <label class="radio col-sm-3">
-        <input type="radio" name="gender" value="male" data-toggle="radio"/><span>Male</span>
+        <input type="radio" name="gender" {{#isGender user 'male'}}checked="checked"{{/isGender}} value="male" data-toggle="radio"/><span>Male</span>
       </label>
       <label class="radio col-sm-3">
-        <input type="radio" name="gender" value="female" data-toggle="radio"/><span>Female</span>
+        <input type="radio" name="gender" {{#isGender user 'female'}}checked="checked"{{/isGender}} value="female" data-toggle="radio"/><span>Female</span>
       </label>
       <label class="radio col-sm-3">
-        <input type="radio" name="gender" value="other" data-toggle="radio"/><span>Other</span>
+        <input type="radio" name="gender" {{#isGender user 'other'}}checked="checked"{{/isGender}} value="other" data-toggle="radio"/><span>Other</span>
       </label>
     </div>
   </div>
@@ -43,7 +43,7 @@
   </div>
   <div class="form-group">
     <label class="col-sm-3 control-label">Gravatar</label>
-    <div class="col-sm-4"><img src="{{user.gravatar()}}" width="100" height="100" class="profile"/></div>
+    <div class="col-sm-4"><img src="{{gravatar user}}" width="100" height="100" class="profile"/></div>
   </div>
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-4">
@@ -55,7 +55,7 @@
   <h3>Change Password</h3>
 </div>
 <form action="/account/password" method="POST" class="form-horizontal">
-  <input type="hidden" name="_csrf" value={{_csrf}}/>
+  <input type="hidden" name="_csrf" value={{_csrf}} />
   <div class="form-group">
     <label for="password" class="col-sm-3 control-label">New Password</label>
     <div class="col-sm-7">
@@ -80,7 +80,7 @@
 <form action="/account/delete" method="POST" class="form-horizontal">
   <div class="form-group">
     <p class="col-sm-offset-3 col-sm-4">You can delete your account, but keep in mind this action is irreversible.</p>
-    <input type="hidden" name="_csrf" value={{_csrf}}/>
+    <input type="hidden" name="_csrf" value={{_csrf}} />
     <div class="col-sm-offset-3 col-sm-4">
       <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i>Delete my account</button>
     </div>
