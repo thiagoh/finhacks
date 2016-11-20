@@ -37,6 +37,7 @@ dotenv.load({
  */
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
+const dataController = require('./controllers/data');
 const contactController = require('./controllers/contact');
 
 /**
@@ -179,8 +180,7 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
-app.get('/generateDatabase', userController.getGenerateDatabase);
-app.get('/populate', userController.getGenerateDatabase);
+app.get('/populate', dataController.getGenerateDatabase);
 app.get('/transactions', userController.getTransaction);
 app.get('/api/transactions', userController.getTransactionApi);
 
