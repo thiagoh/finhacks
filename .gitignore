@@ -1,5 +1,4 @@
 lib-cov
-/android-app
 *.seed
 *.log
 *.csv
