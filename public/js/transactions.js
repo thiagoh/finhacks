@@ -39,6 +39,11 @@ $(function() {
 	app.controller('TransactionsController', ['$scope', '$http', function($scope, $http) {
 
 		$scope.data = {};
+		$scope.data.categories = {
+			1: 'Salary',
+			2: 'Investments',
+			3: 'Expenditures',
+		};
 
 		var clearEdits = function(transactions) {
 			_.each(transactions, function(entry) {
@@ -63,9 +68,24 @@ $(function() {
 				});
 		};
 
+		$scope.showNewAssetModal = function showNewAssetModal() {
+
+			$scope.data.__newAsset = {};
+			$('#assetModal').modal('show');
+		};
+
+		$scope.saveNewAsset = function saveNewAsset() {
+
+			$http.post('/api/assets/save', $scope.data.__newAsset)
+				.then(function(result) {
+					$('#assetModal').modal('hide');
+					$scope.data.__newAsset = result.data;
+				})
+				.finally(function() {});
+		};
+
 		$scope.save = function save(item) {
 			clearEdits($scope.data.transactions);
-
 
 			$http.post('/api/transactions/save', item)
 				.then(function(result) {
