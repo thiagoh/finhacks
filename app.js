@@ -183,6 +183,7 @@ app.post('/account/password', passportConfig.isAuthenticated, userController.pos
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/populate', dataController.getGenerateDatabase);
+app.get('/api/cash-flow', dataController.getCurrentCashFlow);
 app.get('/transactions', transactionsController.getTransaction(app, ExpressHandlebars));
 app.get('/api/transactions', transactionsController.getTransactionApi);
 
