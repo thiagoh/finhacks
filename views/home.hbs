@@ -1,11 +1,25 @@
 <div ng-controller="HomeController">
-	<div class="inner cover">
-	  <h1 class="cover-heading"></h1>
+	<br>
+	<br>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-offset-9 col-md-3">
+				
+				<form >
+					<input type="hidden" name="_csrf" value={{_csrf}} />
+				  <div class="input-group" style="max-width: 300px;">
+			      <input type="text" class="form-control" ng-model="data.price" placeholder="Search for...">
+			      <span class="input-group-btn">
+			        <button class="btn btn-primary" type="button" ng-click="shouldIBuyIt()">Should I buy it?</button>
+			      </span>
+			    </div><!-- /input-group -->
+				</form>
+			</div>
+		</div>
 	</div>
 
-	<form>
-		PUT THE INPUT TEXT HERE!!
-	</form>
+	<br>
 
 	<div id="containerLineChart" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
 	<div id="containerBarChart" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>

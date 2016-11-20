@@ -161,6 +161,8 @@ $(function() {
 	angular.module('finhacksApp', [])
 		.controller('HomeController', ['$scope', '$http', function($scope, $http) {
 
+			$scope.data = {};
+
 			// plotPieChart('containerPieChart');
 
 			plotLineChart('containerLineChart');
@@ -177,6 +179,21 @@ $(function() {
 							assets: (result.data.investSum + result.data.incomeSum) || 0,
 						});
 					});
+
+				$http.get('/api/projected-networth')
+					.then(function(result) {
+
+						console.log(result.data);
+
+						plotBarChart('containerBarChart', {
+							liabilities: result.data.expendituresSum,
+							assets: (result.data.investSum + result.data.incomeSum) || 0,
+						});
+					});
+			};
+
+			$scope.shouldIBuyIt = function shouldIBuyIt() {
+				console.log($scope.data.price);
 			};
 
 			init();
