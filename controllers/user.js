@@ -9,12 +9,6 @@ const TransactionCategory = require('../models/TransactionCategory');
 const Indicator = require('../models/Indicator');
 const IndicatorHistory = require('../models/IndicatorHistory');
 const ObjectId = require('mongoose').Types.ObjectId;
-const MAX_RESULTS = 100;
-const TRANSACTIONS_SORTING = {
-  default: 'date',
-  dt: 'date',
-  rt: 'resourceType',
-};
 
 /**
  * GET /login

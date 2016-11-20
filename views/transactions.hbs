@@ -9,24 +9,41 @@
 				<th>Transaction #</th>
 				<th>Date</th>
 				<th>Amount</th>
-				<th>Category</th>
+				<th style="min-width: 120px;">Category</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
-		<tr ng-repeat="item in data.transactions track by $index" >
-			<td>transaction {{$index}}</td>
-			<td>transaction {{$index}}</td>
-			<td>transaction {{$index}}</td>
-			<td>transaction {{$index}}</td>
+		<tr ng-repeat="(key, item) in data.transactions">
+			<td ng-bind="item.description">
+			</td>
+			<td>
+				<div ng-bind="item.date | date : 'mm/dd/yyyy hh:m:ss'"></div>
+			</td>
+			<td>
+				<div ng-bind="item.amount | number : 2"></div>
+			</td>
+			<td>
+				<div ng-show="!item.__edit" ng-bind="item.categoryId || '-'">
+				</div>
+				<div ng-show="item.__edit === true">
+					<select name="category" ng-model="item.categoryId">
+						<option value="salary">Salary</option>
+						<option value="investments">Investments</option>
+						<option value="expenses">Expenses</option>
+					</select>
+				</div>
+			</td>
 			<td>
 				
-				<div ng-show="!item.__edit" ng-click="edit(item)">
-					<button type="button" class="btn btn-success btn-sm">
-						<i class="btn-sm fa fa-edit fa-lg"></i> Edit
+				<div ng-show="!item.__edit">
+					<button type="button" class="btn" ng-click="edit(item)">
+						<i class="fa i-btn fa-edit fa-lg point"></i>
 					</button>
 				</div>
 				<div ng-show="item.__edit === true">
-					<button type="button" class="btn btn-success">Save</button>
+					<button type="button" class="btn" ng-click="save(item)">
+						<i class="fa i-btn fa-save fa-lg point"></i>
+					</button>
 				</div>
 			</td>
 		</tr>
