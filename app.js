@@ -181,7 +181,7 @@ app.post('/account/delete', passportConfig.isAuthenticated, userController.postD
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/generateDatabase', userController.getGenerateDatabase);
 app.get('/populate', userController.getGenerateDatabase);
-app.get('/transactions', userController.getTransaction);
+app.get('/api/transactions', userController.getTransaction);
 
 app.get('/auth/facebook', passport.authenticate('facebook', {
   scope: ['email', 'user_location']

@@ -139,12 +139,10 @@ exports.postSignup = (req, res, next) => {
 };
 
 /**
- * GET /account
+ * GET /api/transactions
  * Profile page.
  */
 exports.getTransaction = (req, res) => {
-
-  // userId" : ObjectId("5830d9fdea52e627285dafce")
 
   var count = Math.min(Math.max(1, req.query.c || MAX_RESULTS), MAX_RESULTS);
   var orderBy = {};

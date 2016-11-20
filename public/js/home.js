@@ -112,11 +112,11 @@ $(function() {
 
 			series: data || [{
 				name: 'Liabilities',
-				color: '#ff0000',
+				color: '#ff3333',
 				data: [-2.2]
 			}, {
 				name: 'Assests',
-				color: '#90ee7e',
+				color: '#33ff33',
 				data: [1.1]
 			}]
 		});
