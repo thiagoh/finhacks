@@ -55,7 +55,7 @@ $(function() {
 		});
 	};
 
-	var plotBarChart = function plotLineChart(domId, data) {
+	var plotBarChart = function plotBarChart(domId, data) {
 
 		// colors : ['#2b908f', '#90ee7e', '#f45b5b', '#7798BF', '#aaeeee', '#ff0066', '#eeaaee',
 		// 	'#55BF3B', '#DF5353', '#7798BF', '#aaeeee'
@@ -102,8 +102,8 @@ $(function() {
 
 			tooltip: {
 				formatter: function() {
-					return '<b>' + this.series.name + '</b><br/>' +
-						Highcharts.numberFormat(Math.abs(this.point.y), 2);
+					return '<b>' + this.series.name + '</b><br/> $' +
+						Highcharts.numberFormat(Math.abs(this.point.y || 0) / 1000, 2) + 'K';
 				}
 			},
 
@@ -146,7 +146,14 @@ $(function() {
 						enabled: true
 					},
 					enableMouseTracking: false
-				}
+				},
+				series: {
+					dataLabels: {
+						formatter: function() {
+							return '$ ' + Highcharts.numberFormat(((this.y || 0) / 1000).toFixed(2)) + 'K';
+						}
+					}
+				},
 			},
 			series: [{
 				name: 'Purchase Mades',
@@ -166,7 +173,10 @@ $(function() {
 			// plotPieChart('containerPieChart');
 
 			var init = function() {
+				redrawCharts();
+			};
 
+			var redrawCharts = function redrawCharts() {
 				$http.get('/api/cash-flow')
 					.then(function(result) {
 
@@ -178,20 +188,18 @@ $(function() {
 						});
 					});
 
-				$http.get('/api/projected-networth')
+				$http.get('/api/projected-networth?purchasePrice=' + ($scope.data.price || 0))
 					.then(function(result) {
 
 						console.log(result.data);
 
-						plotLineChart('containerLineChart', {
-							liabilities: result.data.expendituresSum,
-							assets: (result.data.investSum + result.data.incomeSum) || 0,
-						});
+						plotLineChart('containerLineChart', result.data);
 					});
 			};
 
 			$scope.shouldIBuyIt = function shouldIBuyIt() {
 				console.log($scope.data.price);
+				redrawCharts();
 			};
 
 			init();
