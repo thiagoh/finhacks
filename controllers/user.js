@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const Asset = require('../models/Asset');
 const Transaction = require('../models/Transaction');
 const TransactionCategory = require('../models/TransactionCategory');
 const Indicator = require('../models/Indicator');

@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const Asset = require('../models/Asset');
 const Transaction = require('../models/Transaction');
 const TransactionCategory = require('../models/TransactionCategory');
 const Indicator = require('../models/Indicator');
@@ -29,14 +30,25 @@ exports.getGenerateDatabase = (req, res) => {
     name: 'Salary'
   }, {
     id: 2,
-    name: 'Funds Invesment 1.5%',
-    interestRate: 1.5
+    name: 'Investment'
   }, {
     id: 3,
     name: 'Expenses'
   }];
   TransactionCategory.collection.insert(arr, function(err, docs) {
     console.log(docs);
+  });
+  
+  Asset.remove().exec();
+  var arr = [{
+    id: 1,
+    name: 'Fixed Deposit Fund',
+	interestRate: 0.015,
+	startDate: new Date(2016,01,15),
+	initialValue: 10000.0
+  }];
+  Asset.collection.insert(arr, function(err, docs) {
+    // console.log(docs);
   });
 
   Transaction.remove().exec();
@@ -60,7 +72,7 @@ exports.getGenerateDatabase = (req, res) => {
         id: i++,
         userId: new ObjectId("5830d9fdea52e627285dafce"),
         date: day,
-        resourceType: 'active',
+		description: 'Ontario Pay',
         categoryId: 1,
         amount: BIWEEKLY_SALARY
       });
@@ -69,7 +81,7 @@ exports.getGenerateDatabase = (req, res) => {
         id: i++,
         userId: new ObjectId("5830d9fdea52e627285dafce"),
         date: day,
-        resourceType: 'passive',
+        description: 'Ontario Pay',
         categoryId: 2,
         amount: INTIAL_ASSET_VALUE * 0.015
       });

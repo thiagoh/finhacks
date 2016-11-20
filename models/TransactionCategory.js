@@ -4,8 +4,7 @@ var Schema = mongoose.Schema,
 	
 const transactionCategorySchema = new mongoose.Schema({
   id: { type: Number, unique: true },
-  name: {type: String},
-  interestRate: {type: Number}
+  name: {type: String}
 }, { timestamps: true });
 
 
