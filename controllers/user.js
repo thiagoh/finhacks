@@ -142,7 +142,7 @@ exports.postSignup = (req, res, next) => {
  * GET /api/transactions
  * Profile page.
  */
-exports.getTransaction = (req, res) => {
+exports.getTransactionApi = (req, res) => {
 
   var count = Math.min(Math.max(1, req.query.c || MAX_RESULTS), MAX_RESULTS);
   var orderBy = {};
@@ -164,6 +164,16 @@ exports.getTransaction = (req, res) => {
       res.send(transactions);
       res.end();
     });
+};
+
+/**
+ * GET /transactions
+ * Transactions page.
+ */
+exports.getTransaction = (req, res) => {
+  res.render('transactions', {
+    title: 'My transactions'
+  });
 };
 
 /**

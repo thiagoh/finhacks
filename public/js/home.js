@@ -126,20 +126,21 @@ $(function() {
 
 		Highcharts.chart(domId, {
 			chart: {
-				type: 'line'
+				type: 'line',
+
 			},
 			title: {
-				text: 'Monthly Average Temperature'
+				text: 'Monthly Average Net Worth'
 			},
 			subtitle: {
-				text: 'Source: WorldClimate.com'
+				text: ''
 			},
 			xAxis: {
 				categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 			},
 			yAxis: {
 				title: {
-					text: 'Temperature (°C)'
+					text: 'Net Worth($)'
 				}
 			},
 			plotOptions: {
@@ -151,10 +152,10 @@ $(function() {
 				}
 			},
 			series: data || [{
-				name: 'Tokyo',
+				name: 'Purchase Mades',
 				data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
 			}, {
-				name: 'London',
+				name: 'Rejected Purchase',
 				data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
 			}]
 		});
@@ -163,9 +164,9 @@ $(function() {
 	angular.module('finhacksApp', [])
 		.controller('HomeController', ['$scope', function($scope) {
 
-			plotPieChart('containerPieChart');
-			plotBarChart('containerLineChart');
-			// plotLineChart('containerLineChart', [{}]);
+			// plotPieChart('containerPieChart');
+			plotBarChart('containerBarChart');
+			plotLineChart('containerLineChart');
 		}]);
 
 	angular.element(function() {
