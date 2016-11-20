@@ -26,7 +26,7 @@
 			<td ng-bind="item.description">
 			</td>
 			<td>
-				<div ng-bind="item.date | date : 'mm/dd/yyyy hh:m:ss'"></div>
+				<div ng-bind="item.date | date : 'MM/dd/yyyy'"></div>
 			</td>
 			<td ng-class="{'transaction-asset': item.categoryId === 1,'transaction-liability': item.categoryId !== 1}">
 				<div ng-bind="item.amount | number : 2"></div>

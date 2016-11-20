@@ -46,43 +46,59 @@ function calculateInvestimentInterest(asset, calcDate){
 									? calcDate : asset.endDate) / 12.0);
 }
 
+function calculateInvestimentInterestRecurring(asset, calcDate){
+	if(!calcDate)
+		calcDate = new Date();
+	
+	var term = monthDiff(asset.startDate,asset.endDate == null || asset.endDate > calcDate ? calcDate : asset.endDate);
+	var sum = 0;
+	for(var i=0; i < term; i++){
+		sum = (sum + asset.initialValue) * (1 + asset.interestRate/12.0);
+	}
+		
+	return sum > 0 ? sum : asset.initialValue;
+}
+
 /**
  * GET /getCurrentCashFlow
  * Return cash-flow.
  */
 exports.getCurrentCashFlow = (req, res) => {
-	var now = new Date();
-	var investSum = 0;
-	var incomeSum = 0;
-	var expendituresSum = 0;
+	if (req.user){
+		var now = new Date();
+		var investSum = 0;
+		var incomeSum = 0;
+		var expendituresSum = 0;
 
-	var assets = Asset.find({
-		userId: req.user.id
-	}).exec((err, assets) => {
-		for (var i = 0; i < assets.length; i++) {
-			investSum += calculateInvestimentInterest(assets[i]) - assets[i].initialValue;
-		}
-
-		var transactions = Transaction.find({
-			userId: req.user.id,
-			date: {
-				$gte: (addMonths(now, -1))
-			},
-			$or: [{categoryId: TRANSACTION_CATEGORY_SALARY}, {categoryId: TRANSACTION_CATEGORY_EXPENDITURES}]
-		}).exec((err, transactions) => {
-			
-			for (var i = 0; i < transactions.length; i++) {
-				if(transactions[i].categoryId == TRANSACTION_CATEGORY_SALARY)
-					incomeSum += transactions[i].amount;
-				else
-					expendituresSum += transactions[i].amount;
+		var assets = Asset.find({
+			userId: req.user.id
+		}).exec((err, assets) => {
+			for (var i = 0; i < assets.length; i++) {
+				investSum += calculateInvestimentInterest(assets[i]) - assets[i].initialValue;
 			}
-			
-			res.setHeader('Content-Type', 'application/json');
-			res.send({investSum: investSum, incomeSum: incomeSum, expendituresSum: expendituresSum});
-			res.end();
+
+			var transactions = Transaction.find({
+				userId: req.user.id,
+				date: {
+					$gte: (addMonths(now, -1))
+				},
+				$or: [{categoryId: TRANSACTION_CATEGORY_SALARY}, {categoryId: TRANSACTION_CATEGORY_EXPENDITURES}]
+			}).exec((err, transactions) => {
+				
+				for (var i = 0; i < transactions.length; i++) {
+					if(transactions[i].categoryId == TRANSACTION_CATEGORY_SALARY)
+						incomeSum += transactions[i].amount;
+					else
+						expendituresSum += transactions[i].amount;
+				}
+				
+				res.setHeader('Content-Type', 'application/json');
+				res.send({investSum: investSum, incomeSum: incomeSum, expendituresSum: expendituresSum});
+				res.end();
+			});
 		});
-	});
+	} else
+		res.end();
 };
 
 /**
@@ -90,57 +106,60 @@ exports.getCurrentCashFlow = (req, res) => {
  * Return cash-flow.
  */
 exports.getProjectedNetWorth = (req, res) => {
-	var now = new Date();
-	var investSum = [];
-	var productPriceInvestSum = [];
-	var incomeSum = 0;
-	var expendituresSum = 0;
-	
-	for (var j = 0; j < 30; j++) {
-		investSum[j] = 0;
-		incomeSum[j] = 0;
-		expendituresSum[j] = 0;
-		productPriceInvestSum[j] = 0;
-	}
-
-	var queryAssets = Asset.find({
-		userId: req.user.id
-	}).exec((err, assets) => {
-		for (var i = 0; i < assets.length; i++) {
-			for (var j = 0; j < 30; j++) {
-				investSum[j] += calculateInvestimentInterest(assets[i], addMonths(now,j*12));
-			}
-		}
+	if (req.user){
+		var now = new Date();
+		var investSum = [];
+		var productPriceInvestSum = [];
+		var incomeSum = 0;
+		var expendituresSum = 0;
 		
-		var productPriceInvestment = {interestRate: 0.05, initialValue: req.query.purchasePrice, startDate: now};
 		for (var j = 0; j < 30; j++) {
-			productPriceInvestSum[j] += calculateInvestimentInterest(productPriceInvestment, addMonths(now,j*12));
+			investSum[j] = 0;
+			incomeSum[j] = 0;
+			expendituresSum[j] = 0;
+			productPriceInvestSum[j] = 0;
 		}
 
-		var queryTran = Transaction.find({
-			userId: req.user.id,
-			date: {$gte: (addMonths(now, -6))},
-			$or: [{categoryId: TRANSACTION_CATEGORY_SALARY}, {categoryId: TRANSACTION_CATEGORY_EXPENDITURES}]
-		}).exec((err, transactions) => {
-			
-			for (var i = 0; i < transactions.length; i++) {
-				if(transactions[i].categoryId == TRANSACTION_CATEGORY_SALARY)
-					incomeSum += transactions[i].amount;
-				else
-					expendituresSum += transactions[i].amount;
+		var queryAssets = Asset.find({
+			userId: req.user.id
+		}).exec((err, assets) => {
+			for (var i = 0; i < assets.length; i++) {
+				for (var j = 0; j < 30; j++) {
+					investSum[j] += calculateInvestimentInterest(assets[i], addMonths(now,j*12));
+				}
 			}
 			
-			var result = {purchaseDone: [], purchaseNotDone: []};
+			var productPriceInvestment = {interestRate: 0.05, initialValue: parseFloat(req.query.purchasePrice || 0), startDate: now};
 			for (var j = 0; j < 30; j++) {
-				result.purchaseDone[j] = investSum[j] + ((j+1) * 12 * (incomeSum/6.0 - expendituresSum/6.0));
-				result.purchaseNotDone[j] = (req.query.purchasePrice ? productPriceInvestSum[j] : 0.0) + investSum[j] + ((j+1) * 12 * (incomeSum/6.0 - expendituresSum/6.0));
+				productPriceInvestSum[j] = calculateInvestimentInterestRecurring(productPriceInvestment, addMonths(now,j*12));
 			}
-			
-			res.setHeader('Content-Type', 'application/json');
-			res.send(result);
-			res.end();
+
+			var queryTran = Transaction.find({
+				userId: req.user.id,
+				date: {$gte: (addMonths(now, -6))},
+				$or: [{categoryId: TRANSACTION_CATEGORY_SALARY}, {categoryId: TRANSACTION_CATEGORY_EXPENDITURES}]
+			}).exec((err, transactions) => {
+				
+				for (var i = 0; i < transactions.length; i++) {
+					if(transactions[i].categoryId == TRANSACTION_CATEGORY_SALARY)
+						incomeSum += transactions[i].amount;
+					else
+						expendituresSum += transactions[i].amount;
+				}
+				
+				var result = {purchaseDone: [], purchaseNotDone: []};
+				for (var j = 0; j < 30; j++) {
+					result.purchaseDone[j] = investSum[j] + ((j+1) * 12 * (incomeSum/6.0 - expendituresSum/6.0));
+					result.purchaseNotDone[j] = (req.query.purchasePrice != null ? productPriceInvestSum[j] : 0.0) + investSum[j] + ((j+1) * 12 * (incomeSum/6.0 - expendituresSum/6.0));
+				}
+				
+				res.setHeader('Content-Type', 'application/json');
+				res.send(result);
+				res.end();
+			});
 		});
-	});
+	} else 
+		res.end();
 };
 
 /**
