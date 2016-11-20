@@ -110,14 +110,14 @@ $(function() {
 				}
 			},
 
-			series: data || [{
+			series: [{
+				name: 'Assets',
+				color: '#33ff33',
+				data: [data.assets]
+			}, {
 				name: 'Liabilities',
 				color: '#ff3333',
-				data: [-2.2]
-			}, {
-				name: 'Assests',
-				color: '#33ff33',
-				data: [1.1]
+				data: [-data.liabilities]
 			}]
 		});
 	};
@@ -162,11 +162,27 @@ $(function() {
 	};
 
 	angular.module('finhacksApp', [])
-		.controller('HomeController', ['$scope', function($scope) {
+		.controller('HomeController', ['$scope', '$http', function($scope, $http) {
 
 			// plotPieChart('containerPieChart');
-			plotBarChart('containerBarChart');
+
 			plotLineChart('containerLineChart');
+
+			var init = function() {
+
+				$http.get('/api/cash-flow')
+					.then(function(result) {
+
+						console.log(result.data);
+
+						plotBarChart('containerBarChart', {
+							liabilities: result.data.expendituresSum,
+							assets: (result.data.investSum + result.data.incomeSum) || 0,
+						});
+					});
+			};
+
+			init();
 		}]);
 
 	angular.element(function() {

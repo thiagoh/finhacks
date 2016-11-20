@@ -3,8 +3,10 @@
  * Profile page.
  */
 
+const moment = require('moment');
 const Transaction = require('../models/Transaction');
 const TransactionCategory = require('../models/TransactionCategory');
+const Asset = require('../models/Asset');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const MAX_RESULTS = 100;
@@ -12,6 +14,34 @@ const TRANSACTIONS_SORTING = {
 	default: 'date',
 	dt: 'date',
 	rt: 'resourceType',
+};
+
+exports.saveAssetApi = (req, res, next) => {
+
+	var asset = new Asset({
+		name: req.body.name,
+		userId: new ObjectId(req.user.id),
+		interestRate: req.body.interestRate,
+		startDate: moment(req.body.startDate || '01/01/1970', "MM/DD/YYYY HH:mm:ss"),
+		endDate: moment(req.body.endDate || '01/01/2030', "MM/DD/YYYY HH:mm:ss"),
+		initialValue: req.body.initialValue
+	});
+
+	console.log(asset);
+
+	asset.save(function(err, asset) {
+		if (err) {
+			console.error(err);
+			res.status(500);
+			res.end();
+			return next(err);
+		}
+		console.log(asset);
+
+		res.setHeader('Content-Type', 'application/json');
+		res.send(asset);
+		res.end();
+	});
 };
 
 exports.saveTransactionApi = (req, res, next) => {
@@ -35,6 +65,7 @@ exports.saveTransactionApi = (req, res, next) => {
 
 		transaction.save((err) => {
 			if (err) {
+				console.error(err);
 				req.flash('errors', {
 					msg: err
 				});
@@ -51,9 +82,9 @@ exports.saveTransactionApi = (req, res, next) => {
 
 	if (!objectId) {
 		var transaction = new Transaction({
-			amount: req.body.amount,
+			amount: parseFloat(req.body.amount),
 			date: new Date(),
-			description: req.body.description,
+			description: req.body.description || '',
 			userId: new ObjectId(req.user.id)
 		});
 		_save(transaction);
@@ -62,6 +93,7 @@ exports.saveTransactionApi = (req, res, next) => {
 
 		Transaction.findById(objectId, (err, transaction) => {
 			if (err) {
+				console.error(err);
 				return next(err);
 			}
 
@@ -102,7 +134,7 @@ exports.getTransaction = function(app, engine) {
 
 	return (req, res) => {
 		res.render('transactions', {
-			title: 'My transactions',
+			title: 'Cache flow',
 			page: 'transactions',
 			partials: Promise.resolve({
 				jsIncludes: engine.handlebars.compile('{{>transactions-scripts}}')

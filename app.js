@@ -189,6 +189,7 @@ app.get('/api/cash-flow', dataController.getCurrentCashFlow);
 app.get('/transactions', transactionsController.getTransaction(app, ExpressHandlebars));
 app.get('/api/transactions', transactionsController.getTransactionApi);
 app.post('/api/transactions/save', transactionsController.saveTransactionApi);
+app.post('/api/assets/save', transactionsController.saveAssetApi);
 
 app.get('/auth/facebook', passport.authenticate('facebook', {
   scope: ['email', 'user_location']
