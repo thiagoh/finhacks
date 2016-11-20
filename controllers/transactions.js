@@ -16,13 +16,13 @@ const TRANSACTIONS_SORTING = {
 
 exports.saveTransactionApi = (req, res, next) => {
 
-	var transactionId = req.body.transactionId;
+	if (!req.user.id) {
+		res.status(500);
+		res.end();
+		return next();
+	}
 
-	Transaction.findById(transactionId, (err, transaction) => {
-		if (err) {
-			return next(err);
-		}
-
+	var _save = function _save(transaction) {
 		if (!transaction) {
 			res.status(404);
 			res.end();
@@ -45,7 +45,29 @@ exports.saveTransactionApi = (req, res, next) => {
 			res.send(transaction);
 			res.end();
 		});
-	});
+	};
+
+	var objectId = req.body._id;
+
+	if (!objectId) {
+		var transaction = new Transaction({
+			amount: req.body.amount,
+			date: new Date(),
+			description: req.body.description,
+			userId: new ObjectId(req.user.id)
+		});
+		_save(transaction);
+
+	} else {
+
+		Transaction.findById(objectId, (err, transaction) => {
+			if (err) {
+				return next(err);
+			}
+
+			_save(transaction);
+		});
+	}
 };
 
 exports.getTransactionApi = (req, res) => {
