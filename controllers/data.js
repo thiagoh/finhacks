@@ -10,6 +10,32 @@ const Indicator = require('../models/Indicator');
 const IndicatorHistory = require('../models/IndicatorHistory');
 const ObjectId = require('mongoose').Types.ObjectId;
 
+function monthDiff(from, to) {
+    var months = to.getMonth() - from.getMonth() + (12 * (to.getFullYear() - from.getFullYear()));
+
+	if(to.getDate() < from.getDate()){
+		months--;
+	}
+	
+	return months;
+}
+
+/**
+ * GET /generateDatabase
+ * Forgot Password page.
+ */
+exports.getCurrentCashFlow = (req, res) => {
+	var assets = Asset.find({userId: req.userId, assetId: { $ne: null }});
+	var assetsSum = 0;
+	var now = new Date();
+	
+	for(var i =0; i > assets.length; i++){
+		assetsSum += assets[i].initialValue * pow((1 + assets[i].interestRate), monthDiff(assets[i].startDate, now)/12);
+	}
+	
+	console.log('assetsSum: ' + assetsSum);
+};
+
 /**
  * GET /generateDatabase
  * Forgot Password page.
@@ -36,7 +62,7 @@ exports.getGenerateDatabase = (req, res) => {
     name: 'Expenses'
   }];
   TransactionCategory.collection.insert(arr, function(err, docs) {
-    console.log(docs);
+    // console.log(docs);
   });
   
   Asset.remove().exec();
@@ -48,7 +74,7 @@ exports.getGenerateDatabase = (req, res) => {
 	initialValue: 10000.0
   }];
   Asset.collection.insert(arr, function(err, docs) {
-    // console.log(docs);
+	console.log(docs);
   });
 
   Transaction.remove().exec();
@@ -76,12 +102,14 @@ exports.getGenerateDatabase = (req, res) => {
         categoryId: 1,
         amount: BIWEEKLY_SALARY
       });
+	  
     if (day.getDate() % 28 == 0) {
       arr1.push({
         id: i++,
         userId: new ObjectId("5830d9fdea52e627285dafce"),
         date: day,
-        description: 'Ontario Pay',
+        description: 'Investment Interest',
+		assetId: new ObjectId("5831146d7b1955561c97e73d"),
         categoryId: 2,
         amount: INTIAL_ASSET_VALUE * 0.015
       });
@@ -93,8 +121,8 @@ exports.getGenerateDatabase = (req, res) => {
         id: i++,
         userId: new ObjectId("5830d9fdea52e627285dafce"),
         date: day,
-        resourceType: 'passive',
         categoryId: 3,
+		description: 'Big Purchase ' + i,
         amount: (Math.random() * (BIG_PURCHASE_MAX - BIG_PURCHASE_MIN) + BIG_PURCHASE_MIN)
       });
     }
@@ -108,8 +136,8 @@ exports.getGenerateDatabase = (req, res) => {
           id: i++,
           userId: new ObjectId("5830d9fdea52e627285dafce"),
           date: day,
-          resourceType: 'passive',
           categoryId: 3,
+		  description: 'Purchase ' + i,
           amount: curAmount
         });
     } while (curTran.date == curTranDate && curIndex % REG_PURCHASE_TRAN_LIMIT > 0);
