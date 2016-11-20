@@ -14,6 +14,40 @@ const TRANSACTIONS_SORTING = {
 	rt: 'resourceType',
 };
 
+exports.saveTransactionApi = (req, res, next) => {
+
+	var transactionId = req.body.transactionId;
+
+	Transaction.findById(transactionId, (err, transaction) => {
+		if (err) {
+			return next(err);
+		}
+
+		if (!transaction) {
+			res.status(404);
+			res.end();
+			return next();
+		}
+
+		console.log(transaction);
+
+		transaction.categoryId = req.body.categoryId;
+
+		transaction.save((err) => {
+			if (err) {
+				req.flash('errors', {
+					msg: err
+				});
+				return next(err);
+			}
+
+			res.setHeader('Content-Type', 'application/json');
+			res.send(transaction);
+			res.end();
+		});
+	});
+};
+
 exports.getTransactionApi = (req, res) => {
 
 	var count = Math.min(Math.max(1, req.query.c || MAX_RESULTS), MAX_RESULTS);

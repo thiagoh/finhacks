@@ -65,6 +65,12 @@ $(function() {
 
 		$scope.save = function save(item) {
 			clearEdits($scope.data.transactions);
+
+
+			$http.post('/api/transactions/save', item)
+				.then(function(result) {
+					console.log(result);
+				});
 		};
 
 		$scope.edit = function edit(item) {
