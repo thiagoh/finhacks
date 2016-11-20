@@ -10,6 +10,7 @@ exports.index = function(app, engine) {
 
 		res.render('home', {
 			title: 'Home',
+			page: 'home',
 			user: {
 				firstName: 'Andre',
 				lastName: 'Oliveira',

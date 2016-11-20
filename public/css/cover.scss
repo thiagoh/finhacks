@@ -19,6 +19,9 @@ a:hover {
   border: 1px solid #fff;
 }
 
+.table-hover > tbody > tr:hover {
+  background-color: #4c4848;
+}
 
 /*
  * Base structure

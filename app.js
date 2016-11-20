@@ -36,6 +36,7 @@ dotenv.load({
  * Controllers (route handlers).
  */
 const homeController = require('./controllers/home');
+const transactionsController = require('./controllers/transactions');
 const userController = require('./controllers/user');
 const dataController = require('./controllers/data');
 const contactController = require('./controllers/contact');
@@ -71,21 +72,22 @@ app.set('views', path.join(__dirname, 'views'));
 // app.engine('handlebars', exphbs({defaultLayout: 'views'}));
 // app.set('view engine', 'handlebars');
 
+var HandlebarsDefaultOptions = {
+    extname: '.hbs',
+    defaultLayout: 'layout',
+    partialsDir: [
+      'views/partials/'
+    ],
+    helpers: {
+      isActivePage: function(page1, page2, block) {
+        return page1 === page2 ? block.fn(this) : '';
+      }
+    }
+  },
+  ExpressHandlebars = exphbs.create(HandlebarsDefaultOptions),
+  hbs = ExpressHandlebars.engine;
 
-
-var defaultOptions = {
-  extname: '.hbs',
-  defaultLayout: 'layout',
-  // Uses multiple partials dirs, templates in "shared/templates/" are shared
-  // with the client-side of the app (see below).
-  partialsDir: [
-    'views/partials/'
-  ]
-};
-var ExpressHandlebars = exphbs.create(defaultOptions);
-var hbs = ExpressHandlebars.engine;
-
-defaultOptions.partials = Promise.resolve({
+HandlebarsDefaultOptions.partials = Promise.resolve({
   jsIncludes: ExpressHandlebars.handlebars.compile('')
 });
 
@@ -181,8 +183,8 @@ app.post('/account/password', passportConfig.isAuthenticated, userController.pos
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/populate', dataController.getGenerateDatabase);
-app.get('/transactions', userController.getTransaction);
-app.get('/api/transactions', userController.getTransactionApi);
+app.get('/transactions', transactionsController.getTransaction(app, ExpressHandlebars));
+app.get('/api/transactions', transactionsController.getTransactionApi);
 
 app.get('/auth/facebook', passport.authenticate('facebook', {
   scope: ['email', 'user_location']
