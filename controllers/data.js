@@ -12,7 +12,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 const TRANSACTION_CATEGORY_SALARY = 1;
 const TRANSACTION_CATEGORY_INVESTMENT = 2;
-const TRANSACTION_CATEGORY_EXPENSE = 3;
+const TRANSACTION_CATEGORY_EXPENDITURES = 3;
 
 function monthDiff(from, to) {
 	var months = to.getMonth() - from.getMonth() + (12 * (to.getFullYear() - from.getFullYear()));
@@ -36,32 +36,35 @@ function addMonths(dateObj, num) {
 	return dateObj;
 }
 
+function calculateInvestimentInterest(asset){
+	investSum += assets.initialValue * 
+						Math.pow((1 + assets.interestRate), monthDiff(assets.startDate,
+									assets.endDate == null || assets.endDate > now 
+											? now : assets.endDate) / 12.0) - assets.initialValue;
+}
+
 /**
- * GET /generateDatabase
- * Forgot Password page.
+ * GET /getCurrentCashFlow
+ * Return cash-flow.
  */
 exports.getCurrentCashFlow = (req, res) => {
 	var now = new Date();
+	var investSum = 0;
+	var incomeSum = 0;
+	var expendituresSum = 0;
 
 	var assets = Asset.find({
 		userId: req.user.id,
-		startDate: {
-			$gte: (addMonths(now, -1))
-		},
-		endDate: {
-			$or: [{
-				$e: null,
-				$lte: now
-			}]
-		}
+		$or: [
+				{endDate: null}, 
+				{endDate: {$lte: now}}
+			]
 	}).exec((err, assets) => {
-
-		var investSum = 0;
-
 		for (var i = 0; i < assets.length; i++) {
-			investSum += assets[i].initialValue * Math.pow((1 + assets[i].interestRate),
-				monthDiff(assets[i].startDate,
-					assets[i].endDate == null || assets[i].endDate < now ? assets[i].endDate : now) / 12.0);
+			investSum += assets[i].initialValue * 
+							Math.pow((1 + assets[i].interestRate), monthDiff(assets[i].startDate,
+										assets[i].endDate == null || assets[i].endDate > now 
+												? now : assets[i].endDate) / 12.0) - assets[i].initialValue;
 		}
 
 		var transactions = Transaction.find({
@@ -69,15 +72,68 @@ exports.getCurrentCashFlow = (req, res) => {
 			date: {
 				$gte: (addMonths(now, -1))
 			},
-			categoryId: {
-				$or: [{
-					$e: TRANSACTION_CATEGORY_SALARY,
-					$e: TRANSACTION_CATEGORY_INVESTMENT
-				}]
+			$or: [{categoryId: TRANSACTION_CATEGORY_SALARY}, {categoryId: TRANSACTION_CATEGORY_EXPENDITURES}]
+		}).exec((err, transactions) => {
+			
+			for (var i = 0; i < transactions.length; i++) {
+				if(transactions[i].categoryId == TRANSACTION_CATEGORY_SALARY)
+					incomeSum += transactions[i].amount;
+				else
+					expendituresSum += transactions[i].amount;
 			}
-		}).exec((err, assets) => {
-			console.log('investSum: ' + investSum + ' diff: ' + monthDiff(assets[i].startDate, now) / 12.0);
+			
+			console.log('investSum: ' + investSum + ' incomeSum: ' + incomeSum + ' expendituresSum: ' + expendituresSum);
+			res.setHeader('Content-Type', 'application/json');
+			res.send({investSum: investSum, incomeSum: incomeSum, expendituresSum: expendituresSum});
+			res.end();
+		});
+	});
+};
 
+/**
+ * GET /getCurrentCashFlow
+ * Return cash-flow.
+ */
+exports.getProjectedNetWorth = (req, res) => {
+	var now = new Date();
+	var investSum = 0;
+	var incomeSum = 0;
+	var expendituresSum = 0;
+
+	var assets = Asset.find({
+		userId: req.user.id,
+		$or: [
+				{endDate: null}, 
+				{endDate: {$lte: now}}
+			]
+	}).exec((err, assets) => {
+		for (var i = 0; i < assets.length; i++) {
+			for (var i = 0; i < assets.length; i++) {
+				investSum += assets[i].initialValue * 
+								Math.pow((1 + assets[i].interestRate), monthDiff(assets[i].startDate,
+											assets[i].endDate == null || assets[i].endDate > now 
+													? now : assets[i].endDate) / 12.0) - assets[i].initialValue;
+			}
+		}
+
+		var transactions = Transaction.find({
+			userId: req.user.id,
+			date: {
+				$gte: (addMonths(now, -4))
+			},
+			$or: [{categoryId: TRANSACTION_CATEGORY_SALARY}, {categoryId: TRANSACTION_CATEGORY_EXPENDITURES}]
+		}).exec((err, transactions) => {
+			
+			for (var i = 0; i < transactions.length; i++) {
+				if(transactions[i].categoryId == TRANSACTION_CATEGORY_SALARY)
+					incomeSum += transactions[i].amount;
+				else
+					expendituresSum += transactions[i].amount;
+			}
+			
+			console.log('investSum: ' + investSum + ' incomeSum: ' + incomeSum + ' expendituresSum: ' + expendituresSum);
+			res.setHeader('Content-Type', 'application/json');
+			res.send({investSum: investSum, incomeSum: incomeSum, expendituresSum: expendituresSum});
 			res.end();
 		});
 	});
@@ -85,7 +141,7 @@ exports.getCurrentCashFlow = (req, res) => {
 
 /**
  * GET /generateDatabase
- * Forgot Password page.
+ * Database Sample Data Generation
  */
 exports.getGenerateDatabase = (req, res) => {
 
@@ -134,7 +190,6 @@ exports.getGenerateDatabase = (req, res) => {
 
 		Asset.remove().exec();
 		var arr = [{
-			id: 1,
 			name: 'Fixed Deposit Fund',
 			userId: user._id,
 			interestRate: 0.015,
@@ -156,7 +211,7 @@ exports.getGenerateDatabase = (req, res) => {
 		for (var i = 0; i < SAMPLE_DATA_LIMIT; i++) {
 			var curTranDate = transactionSample[curIndex].date;
 			var day = new Date(transactionSample[curIndex].date);
-			day = new Date(day.getFullYear() + 3, day.getMonth(), day.getDate());
+			day = new Date(day.getFullYear() + 4, day.getMonth(), day.getDate());
 
 			if (day >= today)
 				break;
@@ -167,29 +222,17 @@ exports.getGenerateDatabase = (req, res) => {
 					userId: new ObjectId(user._id),
 					date: day,
 					description: 'Ontario Pay',
-					categoryId: 1,
+					categoryId: TRANSACTION_CATEGORY_SALARY,
 					amount: BIWEEKLY_SALARY
 				});
 
-			if (day.getDate() % 28 == 0) {
-				arr1.push({
-					id: i++,
-					userId: new ObjectId(user._id),
-					date: day,
-					description: 'Investment Interest',
-					assetId: 1,
-					categoryId: 2,
-					amount: INTIAL_ASSET_VALUE * 0.015
-				});
-				INTIAL_ASSET_VALUE *= 1.015;
-			}
 
 			if (Math.random() <= BIG_PURCHASE_PROBABILITY) {
 				arr1.push({
 					id: i++,
 					userId: new ObjectId(user._id),
 					date: day,
-					categoryId: 3,
+					categoryId: TRANSACTION_CATEGORY_EXPENDITURES,
 					description: 'Big Purchase ' + i,
 					amount: (Math.random() * (BIG_PURCHASE_MAX - BIG_PURCHASE_MIN) + BIG_PURCHASE_MIN)
 				});
@@ -204,7 +247,7 @@ exports.getGenerateDatabase = (req, res) => {
 						id: i++,
 						userId: new ObjectId(user._id),
 						date: day,
-						categoryId: 3,
+						categoryId: TRANSACTION_CATEGORY_EXPENDITURES,
 						description: 'Purchase ' + i,
 						amount: curAmount
 					});
