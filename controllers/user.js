@@ -7,6 +7,13 @@ const Transaction = require('../models/Transaction');
 const TransactionCategory = require('../models/TransactionCategory');
 const Indicator = require('../models/Indicator');
 const IndicatorHistory = require('../models/IndicatorHistory');
+const ObjectId = require('mongoose').Types.ObjectId;
+const MAX_RESULTS = 100;
+const TRANSACTIONS_SORTING = {
+  default: 'date',
+  dt: 'date',
+  rt: 'resourceType',
+};
 
 /**
  * GET /login
@@ -137,17 +144,28 @@ exports.postSignup = (req, res, next) => {
  */
 exports.getTransaction = (req, res) => {
 
-  Transaction.find({
-    userId: req.user.id
-  }).exec((err, transactions) => {
-    if (err) {
-      return next(err);
-    }
+  // userId" : ObjectId("5830d9fdea52e627285dafce")
 
-    res.setHeader('Content-Type', 'application/json');
-    res.send(transactions);
-    res.end();
-  });
+  var count = Math.min(Math.max(1, req.query.c || MAX_RESULTS), MAX_RESULTS);
+  var orderBy = {};
+  orderBy[TRANSACTIONS_SORTING[req.query.s] || TRANSACTIONS_SORTING.default] = req.query.a === 'asc' ? 1 : -1;
+
+  console.log(orderBy);
+
+  Transaction.find({
+      userId: req.user.id
+    })
+    .limit(count)
+    .sort(orderBy)
+    .exec((err, transactions) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.setHeader('Content-Type', 'application/json');
+      res.send(transactions);
+      res.end();
+    });
 };
 
 /**
@@ -528,7 +546,7 @@ exports.getGenerateDatabase = (req, res) => {
     if (day.getDate() % 14 == 0)
       arr1.push({
         id: i++,
-        userId: null,
+        userId: new ObjectId("5830d9fdea52e627285dafce"),
         date: day,
         resourceType: 'active',
         categoryId: 1,
@@ -537,7 +555,7 @@ exports.getGenerateDatabase = (req, res) => {
     if (day.getDate() % 28 == 0) {
       arr1.push({
         id: i++,
-        userId: null,
+        userId: new ObjectId("5830d9fdea52e627285dafce"),
         date: day,
         resourceType: 'passive',
         categoryId: 2,
@@ -549,10 +567,10 @@ exports.getGenerateDatabase = (req, res) => {
     if (Math.random() <= BIG_PURCHASE_PROBABILITY) {
       arr1.push({
         id: i++,
-        userId: null,
+        userId: new ObjectId("5830d9fdea52e627285dafce"),
         date: day,
         resourceType: 'passive',
-        categoryId: 4,
+        categoryId: 3,
         amount: (Math.random() * (BIG_PURCHASE_MAX - BIG_PURCHASE_MIN) + BIG_PURCHASE_MIN)
       });
     }
@@ -561,10 +579,10 @@ exports.getGenerateDatabase = (req, res) => {
       var curTran = transactionSample[curIndex++];
       var curAmount = (curTran.purchasequantity * curTran.purchaseamount);
 
-      if (curAmount > 0 && curAmount < 500.0)
+      if (curAmount > 0 && curAmount < 100.0)
         arr1.push({
           id: i++,
-          userId: null,
+          userId: new ObjectId("5830d9fdea52e627285dafce"),
           date: day,
           resourceType: 'passive',
           categoryId: 3,
@@ -575,7 +593,8 @@ exports.getGenerateDatabase = (req, res) => {
     while (curTran.date == curTranDate)
       var curTran = transactionSample[curIndex++];
   }
-  fs.writeFile('models/insertedSampleData.json', JSON.stringify(arr1));
+
+  // fs.writeFile('models/insertedSampleData.json', JSON.stringify(arr1));
 
   Transaction.collection.insert(arr1, function(err, docs) {
     // Transaction.find().sort('-date').limit(1).exec( function (err,result){ console.log('max: ' + result[0].date);});

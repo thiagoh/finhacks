@@ -2,7 +2,10 @@ $(function() {
 
 	'use strict';
 
-	var plotPieChart = function plotPieChart(domId) {
+	var plotPieChart = function plotPieChart(domId, data) {
+
+		// /transactions?c=200&s=rt&a=asc
+		// /transactions?c=200&s=rt&a=asc
 
 		Highcharts.chart(domId, {
 			chart: {
@@ -27,7 +30,7 @@ $(function() {
 					showInLegend: true
 				}
 			},
-			series: [{
+			series: data || [{
 				name: 'Brands',
 				colorByPoint: true,
 				data: [{
@@ -53,9 +56,73 @@ $(function() {
 				}]
 			}]
 		});
-	}
+	};
 
-	var plotLineChart = function plotLineChart(domId) {
+	var plotBarChart = function plotLineChart(domId, data) {
+
+		// colors : ['#2b908f', '#90ee7e', '#f45b5b', '#7798BF', '#aaeeee', '#ff0066', '#eeaaee',
+		// 	'#55BF3B', '#DF5353', '#7798BF', '#aaeeee'
+		// ]
+
+		Highcharts.chart(domId, {
+			chart: {
+				type: 'bar'
+			},
+			title: {
+				text: 'Your current Liabilities and Assests ($ in thousand)'
+			},
+			xAxis: [{
+				categories: ['Liabilities'],
+				reversed: false,
+				labels: {
+					step: 1
+				}
+			}, { // mirror axis on right side
+				opposite: true,
+				reversed: false,
+				categories: ['Assets'],
+				linkedTo: 0,
+				labels: {
+					step: 1
+				}
+			}],
+			yAxis: {
+				title: {
+					text: null
+				},
+				labels: {
+					formatter: function() {
+						return Math.abs(this.value);
+					}
+				}
+			},
+
+			plotOptions: {
+				series: {
+					stacking: 'normal'
+				}
+			},
+
+			tooltip: {
+				formatter: function() {
+					return '<b>' + this.series.name + '</b><br/>' +
+						Highcharts.numberFormat(Math.abs(this.point.y), 2);
+				}
+			},
+
+			series: data || [{
+				name: 'Liabilities',
+				color: '#ff0000',
+				data: [-2.2]
+			}, {
+				name: 'Assests',
+				color: '#90ee7e',
+				data: [1.1]
+			}]
+		});
+	};
+
+	var plotLineChart = function plotLineChart(domId, data) {
 
 		Highcharts.chart(domId, {
 			chart: {
@@ -83,7 +150,7 @@ $(function() {
 					enableMouseTracking: false
 				}
 			},
-			series: [{
+			series: data || [{
 				name: 'Tokyo',
 				data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
 			}, {
@@ -93,6 +160,15 @@ $(function() {
 		});
 	};
 
-	plotPieChart('containerPieChart');
-	plotLineChart('containerLineChart');
+	angular.module('finhacksApp', [])
+		.controller('HomeController', ['$scope', function($scope) {
+
+			plotPieChart('containerPieChart');
+			plotBarChart('containerLineChart');
+			// plotLineChart('containerLineChart', [{}]);
+		}]);
+
+	angular.element(function() {
+		angular.bootstrap(document, ['finhacksApp']);
+	});
 });
