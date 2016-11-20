@@ -134,7 +134,7 @@ exports.getTransaction = function(app, engine) {
 
 	return (req, res) => {
 		res.render('transactions', {
-			title: 'Cache flow',
+			title: 'Cash flow',
 			page: 'transactions',
 			partials: Promise.resolve({
 				jsIncludes: engine.handlebars.compile('{{>transactions-scripts}}')
