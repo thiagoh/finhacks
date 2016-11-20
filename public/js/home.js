@@ -65,12 +65,15 @@ $(function() {
 		// 	'#55BF3B', '#DF5353', '#7798BF', '#aaeeee'
 		// ]
 
+		
+		var cashFlow = data.assets - data.liabilities;
+				
 		Highcharts.chart(domId, {
 			chart: {
 				type: 'bar'
 			},
 			title: {
-				text: ''
+				text: 'CashFlow: $' + cashFlow.toFixed(2)
 			},
 			xAxis: [{
 				categories: ['Expenditures'],
