@@ -37,7 +37,7 @@ cd finhacks
 # Install NPM dependencies
 npm install
 
-# Install NPM dependencies
+# Install Bower
 npm install bower -g
 
 # Install Bower dependencies
