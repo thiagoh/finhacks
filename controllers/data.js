@@ -144,6 +144,7 @@ exports.getGenerateDatabase = (req, res) => {
 	const BIG_PURCHASE_MIN = 500;
 	const BIG_PURCHASE_PROBABILITY = 2 / 100.0;
 	const REG_PURCHASE_TRAN_LIMIT = 15;
+	const REG_PURCHASE_TRAN_MIN = 10;
 	var INTIAL_ASSET_VALUE = 15000.0;
 	var SAMPLE_DATA_LIMIT = 5000;
 
@@ -234,7 +235,7 @@ exports.getGenerateDatabase = (req, res) => {
 
 					do {
 						var curTran = transactionSample[curIndex++];
-						var curAmount = (curTran.purchasequantity * curTran.purchaseamount);
+						var curAmount = REG_PURCHASE_TRAN_MIN + (curTran.purchasequantity * curTran.purchaseamount);
 
 						if (curAmount > 0 && curAmount < 100.0)
 							arr1.push({
