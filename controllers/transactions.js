@@ -21,13 +21,11 @@ exports.saveAssetApi = (req, res, next) => {
 	var asset = new Asset({
 		name: req.body.name,
 		userId: new ObjectId(req.user.id),
-		interestRate: req.body.interestRate,
+		interestRate: (parseFloat(req.body.interestRate) || 0) / 100,
 		startDate: moment(req.body.startDate || '01/01/1970', "MM/DD/YYYY HH:mm:ss"),
 		endDate: moment(req.body.endDate || '01/01/2030', "MM/DD/YYYY HH:mm:ss"),
 		initialValue: req.body.initialValue
 	});
-
-	console.log(asset);
 
 	asset.save(function(err, asset) {
 		if (err) {
@@ -36,8 +34,6 @@ exports.saveAssetApi = (req, res, next) => {
 			res.end();
 			return next(err);
 		}
-		console.log(asset);
-
 		res.setHeader('Content-Type', 'application/json');
 		res.send(asset);
 		res.end();
@@ -134,7 +130,7 @@ exports.getTransaction = function(app, engine) {
 
 	return (req, res) => {
 		res.render('transactions', {
-			title: 'Cache flow',
+			title: 'Cash flow',
 			page: 'transactions',
 			partials: Promise.resolve({
 				jsIncludes: engine.handlebars.compile('{{>transactions-scripts}}')
