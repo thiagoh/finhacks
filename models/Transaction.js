@@ -4,7 +4,6 @@ var Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 	
 const transactionSchema = new mongoose.Schema({
-  id: { type: Number, unique: true },
   userId: {type: Schema.Types.ObjectId, ref: 'User'},
   date: Date,
   assetId: Number,

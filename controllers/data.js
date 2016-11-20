@@ -1,4 +1,4 @@
-const async = require('async');
+async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
@@ -9,6 +9,10 @@ const TransactionCategory = require('../models/TransactionCategory');
 const Indicator = require('../models/Indicator');
 const IndicatorHistory = require('../models/IndicatorHistory');
 const ObjectId = require('mongoose').Types.ObjectId;
+
+const TRANSACTION_CATEGORY_SALARY = 1;
+const TRANSACTION_CATEGORY_INVESTMENT = 2;
+const TRANSACTION_CATEGORY_EXPENSE = 3;
 
 function monthDiff(from, to) {
     var months = to.getMonth() - from.getMonth() + (12 * (to.getFullYear() - from.getFullYear()));
@@ -28,6 +32,7 @@ function addMonths(dateObj, num) {
     if (dateObj.getMonth() != ((currentMonth + num) % 12)){
         dateObj.setDate(0);
     }
+	
     return dateObj;
 }
 
@@ -38,25 +43,29 @@ function addMonths(dateObj, num) {
 exports.getCurrentCashFlow = (req, res) => {
 	var now = new Date();
 	
-	var assets = Asset.find(
-			{
-				userId: req.user.id, 
-				startDate: { $gte:(addMonths(now,-1))}, 
-				endDate: $or [{ $e : null, $lte: now}]
-			}
+	var assets = Asset.find({
+			userId: req.user.id, 
+			startDate: {$gte: (addMonths(now,-1))}, 
+			endDate: {$or: [{ $e : null, $lte: now}]}
 		}).exec((err,assets) => { 
 	
-		var assetsSum = 0;
+		var investSum = 0;
 			
 		for(var i =0; i < assets.length; i++){
-			assetsSum += assets[i].initialValue * Math.pow((1 + assets[i].interestRate), 
+			investSum += assets[i].initialValue * Math.pow((1 + assets[i].interestRate), 
 																monthDiff(assets[i].startDate, 
 																			assets[i].endDate == null || assets[i].endDate < now ? assets[i].endDate : now)/12.0);
 		}
 		
-		console.log('assetsSum: ' + assetsSum + ' diff: ' + monthDiff(assets[i].startDate, now)/12.0);
-		
-		res.end();
+		var transactions = Transaction.find({
+			userId: req.user.id, 
+			date: { $gte:(addMonths(now,-1))}, 
+			categoryId: {$or: [{ $e : TRANSACTION_CATEGORY_SALARY, $e: TRANSACTION_CATEGORY_INVESTMENT}]}
+		}).exec((err,assets) => { 
+			console.log('investSum: ' + investSum + ' diff: ' + monthDiff(assets[i].startDate, now)/12.0);
+			
+			res.end();
+		});
 	});
 };
 
