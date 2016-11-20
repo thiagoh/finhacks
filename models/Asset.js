@@ -4,6 +4,7 @@ var Schema = mongoose.Schema,
 	
 const assetSchema = new mongoose.Schema({
   id: { type: Number, unique: true },
+  userId: { type: ObjectId, ref: 'User' },
   name: String,
   interestRate: Number,
   initialValue: Number,

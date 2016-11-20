@@ -7,8 +7,8 @@ const transactionSchema = new mongoose.Schema({
   id: { type: Number, unique: true },
   userId: {type: Schema.Types.ObjectId, ref: 'User'},
   date: Date,
-  assetId: {type: Schema.Types.ObjectId, ref: 'Asset'},
-  categoryId: {type: Schema.Types.ObjectId, ref: 'Category'},
+  assetId: Number,
+  categoryId: Number,
   description: {type: String},
   amount: { type: Number, required: true }
 }, { timestamps: true });
