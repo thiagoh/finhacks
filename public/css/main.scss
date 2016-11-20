@@ -5,6 +5,16 @@
 // Scaffolding
 // -------------------------
 
+.transaction-asset {
+  color: #33ff33;
+  font-weight: bold;
+}
+ 
+.transaction-liability {
+  color: #ff3333;
+  font-weight: bold;
+}
+
 html {
   position: relative;
   min-height: 100%;

@@ -4,9 +4,6 @@ $(function() {
 
 	var plotPieChart = function plotPieChart(domId, data) {
 
-		// /transactions?c=200&s=rt&a=asc
-		// /transactions?c=200&s=rt&a=asc
-
 		Highcharts.chart(domId, {
 			chart: {
 				plotBackgroundColor: null,
@@ -69,10 +66,10 @@ $(function() {
 				type: 'bar'
 			},
 			title: {
-				text: 'Your current Liabilities and Assests ($ in thousand)'
+				text: 'Your current Expenditures and Incomes ($ in thousand)'
 			},
 			xAxis: [{
-				categories: ['Liabilities'],
+				categories: ['Expenditures'],
 				reversed: false,
 				labels: {
 					step: 1
@@ -80,7 +77,7 @@ $(function() {
 			}, { // mirror axis on right side
 				opposite: true,
 				reversed: false,
-				categories: ['Assets'],
+				categories: ['Income'],
 				linkedTo: 0,
 				labels: {
 					step: 1
@@ -111,11 +108,11 @@ $(function() {
 			},
 
 			series: [{
-				name: 'Assets',
+				name: 'Income',
 				color: '#33ff33',
 				data: [data.assets]
 			}, {
-				name: 'Liabilities',
+				name: 'Expenditures',
 				color: '#ff3333',
 				data: [-data.liabilities]
 			}]

@@ -18,8 +18,8 @@
 				<th>Transaction #</th>
 				<th>Date</th>
 				<th>Amount</th>
-				<th style="min-width: 120px;">Category</th>
-				<th>Actions</th>
+				<!-- <th style="min-width: 120px;">Category</th> -->
+				<!-- <th>Actions</th> -->
 			</tr>
 		</thead>
 		<tr ng-repeat="(key, item) in data.transactions">
@@ -28,7 +28,7 @@
 			<td>
 				<div ng-bind="item.date | date : 'mm/dd/yyyy hh:m:ss'"></div>
 			</td>
-			<td>
+			<td ng-class="{'transaction-asset': item.categoryId === 1,'transaction-liability': item.categoryId !== 1}">
 				<div ng-bind="item.amount | number : 2"></div>
 			</td>
 			<!--
@@ -43,7 +43,6 @@
 					</select>
 				</div>
 			</td>
-			-->
 			<td>
 				<div ng-show="!item.__edit">
 					<button type="button" class="btn" ng-click="edit(item)">
@@ -56,6 +55,7 @@
 					</button>
 				</div>
 			</td>
+			-->
 		</tr>
 	</table>
 
