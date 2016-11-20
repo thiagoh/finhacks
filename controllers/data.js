@@ -27,13 +27,14 @@ function monthDiff(from, to) {
 function addMonths(dateObj, num) {
 
 	var currentMonth = dateObj.getMonth();
-	dateObj.setMonth(dateObj.getMonth() + num)
+	var newDate = new Date(dateObj);
+	newDate.setMonth(newDate.getMonth() + num);
 
-	if (dateObj.getMonth() != ((currentMonth + num) % 12)) {
-		dateObj.setDate(0);
+	if (newDate.getMonth() != ((currentMonth + num) % 12)) {
+		newDate.setDate(0);
 	}
 
-	return dateObj;
+	return newDate;
 }
 
 function calculateInvestimentInterest(asset, calcDate){
@@ -42,7 +43,7 @@ function calculateInvestimentInterest(asset, calcDate){
 	return asset.initialValue * 
 				Math.pow((1 + asset.interestRate), monthDiff(asset.startDate,
 							asset.endDate == null || asset.endDate > calcDate 
-									? calcDate : asset.endDate) / 12.0) - asset.initialValue;
+									? calcDate : asset.endDate) / 12.0);
 }
 
 /**
@@ -59,7 +60,7 @@ exports.getCurrentCashFlow = (req, res) => {
 		userId: req.user.id
 	}).exec((err, assets) => {
 		for (var i = 0; i < assets.length; i++) {
-			investSum += calculateInvestimentInterest(assets[i]);
+			investSum += calculateInvestimentInterest(assets[i]) - assets[i].initialValue;
 		}
 
 		var transactions = Transaction.find({
@@ -77,7 +78,6 @@ exports.getCurrentCashFlow = (req, res) => {
 					expendituresSum += transactions[i].amount;
 			}
 			
-			console.log('investSum: ' + investSum + ' incomeSum: ' + incomeSum + ' expendituresSum: ' + expendituresSum);
 			res.setHeader('Content-Type', 'application/json');
 			res.send({investSum: investSum, incomeSum: incomeSum, expendituresSum: expendituresSum});
 			res.end();
@@ -95,26 +95,24 @@ exports.getProjectedNetWorth = (req, res) => {
 	var incomeSum = 0;
 	var expendituresSum = 0;
 	
-	for (var j = 0; j < 30; i++) {
+	for (var j = 0; j < 30; j++) {
 		investSum[j] = 0;
 		incomeSum[j] = 0;
 		expendituresSum[j] = 0;
 	}
 
-	var assets = Asset.find({
+	var queryAssets = Asset.find({
 		userId: req.user.id
 	}).exec((err, assets) => {
 		for (var i = 0; i < assets.length; i++) {
-			for (var j = 0; j < 30; i++) {
+			for (var j = 0; j < 30; j++) {
 				investSum[j] += calculateInvestimentInterest(assets[i], addMonths(now,j*12));
 			}
 		}
 
-		var transactions = Transaction.find({
+		var queryTran = Transaction.find({
 			userId: req.user.id,
-			date: {
-				$gte: (addMonths(now, -6))
-			},
+			date: {$gte: (addMonths(now, -6))},
 			$or: [{categoryId: TRANSACTION_CATEGORY_SALARY}, {categoryId: TRANSACTION_CATEGORY_EXPENDITURES}]
 		}).exec((err, transactions) => {
 			
@@ -125,9 +123,13 @@ exports.getProjectedNetWorth = (req, res) => {
 					expendituresSum += transactions[i].amount;
 			}
 			
-			console.log('investSum: ' + investSum + ' incomeSum: ' + incomeSum + ' expendituresSum: ' + expendituresSum);
+			var result = [];
+			for (var j = 0; j < 30; j++) {
+				result[j] = investSum[j] + incomeSum/6.0 - expendituresSum/6.0;
+			}
+			
 			res.setHeader('Content-Type', 'application/json');
-			res.send({investSum: investSum, incomeSum: incomeSum, expendituresSum: expendituresSum});
+			res.send(result);
 			res.end();
 		});
 	});
@@ -142,7 +144,7 @@ exports.getGenerateDatabase = (req, res) => {
 	const BIWEEKLY_SALARY = 2000.0;
 	const BIG_PURCHASE_MAX = 2000.0;
 	const BIG_PURCHASE_MIN = 500;
-	const BIG_PURCHASE_PROBABILITY = 2 / 100.0;
+	const BIG_PURCHASE_PROBABILITY = 1 / 100.0;
 	const REG_PURCHASE_TRAN_LIMIT = 15;
 	const REG_PURCHASE_TRAN_MIN = 10;
 	var INTIAL_ASSET_VALUE = 15000.0;
