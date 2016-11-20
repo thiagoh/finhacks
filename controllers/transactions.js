@@ -22,10 +22,12 @@ exports.saveAssetApi = (req, res, next) => {
 		name: req.body.name,
 		userId: new ObjectId(req.user.id),
 		interestRate: req.body.interestRate,
-		startDate: moment(req.body.startDate || '', "MM/DD/YYYY HH:mm:ss"),
-		endDate: moment(req.body.endDate || '', "MM/DD/YYYY HH:mm:ss"),
+		startDate: moment(req.body.startDate || '01/01/1970', "MM/DD/YYYY HH:mm:ss"),
+		endDate: moment(req.body.endDate || '01/01/2030', "MM/DD/YYYY HH:mm:ss"),
 		initialValue: req.body.initialValue
 	});
+
+	console.log(asset);
 
 	asset.save(function(err, asset) {
 		if (err) {
