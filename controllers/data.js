@@ -92,6 +92,7 @@ exports.getCurrentCashFlow = (req, res) => {
 exports.getProjectedNetWorth = (req, res) => {
 	var now = new Date();
 	var investSum = [];
+	var productPriceInvestSum = [];
 	var incomeSum = 0;
 	var expendituresSum = 0;
 	
@@ -99,6 +100,7 @@ exports.getProjectedNetWorth = (req, res) => {
 		investSum[j] = 0;
 		incomeSum[j] = 0;
 		expendituresSum[j] = 0;
+		productPriceInvestSum[j] = 0;
 	}
 
 	var queryAssets = Asset.find({
@@ -108,6 +110,11 @@ exports.getProjectedNetWorth = (req, res) => {
 			for (var j = 0; j < 30; j++) {
 				investSum[j] += calculateInvestimentInterest(assets[i], addMonths(now,j*12));
 			}
+		}
+		
+		var productPriceInvestment = {interestRate: 0.05, initialValue: req.query.purchasePrice, startDate: now};
+		for (var j = 0; j < 30; j++) {
+			productPriceInvestSum[j] += calculateInvestimentInterest(productPriceInvestment, addMonths(now,j*12));
 		}
 
 		var queryTran = Transaction.find({
@@ -123,9 +130,10 @@ exports.getProjectedNetWorth = (req, res) => {
 					expendituresSum += transactions[i].amount;
 			}
 			
-			var result = [];
+			var result = {purchaseDone: [], purchaseNotDone: []};
 			for (var j = 0; j < 30; j++) {
-				result[j] = investSum[j] + incomeSum/6.0 - expendituresSum/6.0;
+				result.purchaseDone[j] = investSum[j] + ((j+1) * 12 * (incomeSum/6.0 - expendituresSum/6.0));
+				result.purchaseNotDone[j] = (req.query.purchasePrice ? productPriceInvestSum[j] : 0.0) + investSum[j] + ((j+1) * 12 * (incomeSum/6.0 - expendituresSum/6.0));
 			}
 			
 			res.setHeader('Content-Type', 'application/json');
