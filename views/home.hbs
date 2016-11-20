@@ -3,9 +3,23 @@
 	  <h1 class="cover-heading"></h1>
 	</div>
 
-	<form>
-		PUT THE INPUT TEXT HERE!!
-	</form>
+	<form class="form-inline">
+                      <div class="form-group">
+                        <label class="sr-only" for="exampleInputAmount">Enter Product Amount (in dollars)</label>
+                        <div class="input-group">
+                          <div class="input-group-addon">$</div>
+                          <input type="text" class="form-control" id="exampleInputAmount" placeholder="Your product price">
+                          <div class="input-group-addon"></div>
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Calculate</button> </br> </br> </br>
+                      <!--<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div> -->
+                      <div id="container2"></div> <br>
+                      <button type="button" class="btn btn-lg btn-primary">Balance</button> </br></br></br>
+
+                      <div id="container" ></div>
+
+            </form>
 
 	<div id="containerLineChart" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
 	<div id="containerBarChart" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
