@@ -2,6 +2,10 @@ $(function() {
 
 	'use strict';
 
+	var _format = function(v) {
+		return parseFloat((v || 0).toFixed(2));
+	};
+
 	var plotPieChart = function plotPieChart(domId, data) {
 
 		Highcharts.chart(domId, {
@@ -66,7 +70,7 @@ $(function() {
 				type: 'bar'
 			},
 			title: {
-				text: 'Your current Expenditures and Incomes ($ in thousand)'
+				text: ''
 			},
 			xAxis: [{
 				categories: ['Expenditures'],
@@ -124,10 +128,9 @@ $(function() {
 		Highcharts.chart(domId, {
 			chart: {
 				type: 'line',
-
 			},
 			title: {
-				text: 'Monthly Average Net Worth'
+				text: ''
 			},
 			subtitle: {
 				text: ''
@@ -139,6 +142,11 @@ $(function() {
 				title: {
 					text: 'Net Worth($)'
 				}
+			},
+			tooltip: {
+				valueDecimals: 2,
+				valuePrefix: '$',
+				valueSuffix: ' USD'
 			},
 			plotOptions: {
 				line: {
@@ -193,7 +201,10 @@ $(function() {
 
 						console.log(result.data);
 
-						plotLineChart('containerLineChart', result.data);
+						plotLineChart('containerLineChart', {
+							purchaseDone: _.map(result.data.purchaseDone || [], _format),
+							purchaseNotDone: _.map(result.data.purchaseNotDone || [], _format),
+						});
 					});
 			};
 
