@@ -19,6 +19,22 @@ a:hover {
   border: 1px solid #fff;
 }
 
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: #000;
+}
+
+i.i-btn {
+  margin: 0;
+}
+
+i.point {
+  cursor: pointer;
+}
+
 .table-hover > tbody > tr:hover {
   background-color: #4c4848;
 }

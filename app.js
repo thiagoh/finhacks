@@ -129,7 +129,9 @@ app.use((req, res, next) => {
   if (req.path === '/api/upload') {
     next();
   } else {
-    lusca.csrf()(req, res, next);
+    lusca.csrf({
+      angular: true
+    })(req, res, next);
   }
 });
 app.use(lusca.xframe('SAMEORIGIN'));
@@ -186,6 +188,7 @@ app.get('/populate', dataController.getGenerateDatabase);
 app.get('/api/cash-flow', dataController.getCurrentCashFlow);
 app.get('/transactions', transactionsController.getTransaction(app, ExpressHandlebars));
 app.get('/api/transactions', transactionsController.getTransactionApi);
+app.post('/api/transactions/save', transactionsController.saveTransactionApi);
 
 app.get('/auth/facebook', passport.authenticate('facebook', {
   scope: ['email', 'user_location']

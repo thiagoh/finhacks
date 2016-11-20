@@ -1,7 +1,26 @@
 <div ng-controller="TransactionsController">
 	<div class="inner cover">
-	  <h1 class="cover-heading">{{title}}</h1>
+	  <h1 class="cover-heading">
+	  	Cache flow
+	  </h1>
 	</div>
+
+	<br />
+
+	<form class="form-horizontal">
+		<input type="hidden" name="_csrf" value={{_csrf}} />
+	  <div class="form-group">
+	    <label for="exampleInputEmail1">Email address</label>
+	    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+	  </div>
+	  <div class="form-group">
+	    <label for="exampleInputPassword1">Password</label>
+	    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+	  </div>
+	  <button type="submit" class="btn btn-default">Submit</button>
+	</form>
+
+	<br />
 
 	<table class="table table-bordered table-hover">
 		<thead>
@@ -9,24 +28,41 @@
 				<th>Transaction #</th>
 				<th>Date</th>
 				<th>Amount</th>
-				<th>Category</th>
+				<th style="min-width: 120px;">Category</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
-		<tr ng-repeat="item in data.transactions track by $index" >
-			<td>transaction {{$index}}</td>
-			<td>transaction {{$index}}</td>
-			<td>transaction {{$index}}</td>
-			<td>transaction {{$index}}</td>
+		<tr ng-repeat="(key, item) in data.transactions">
+			<td ng-bind="item.description">
+			</td>
+			<td>
+				<div ng-bind="item.date | date : 'mm/dd/yyyy hh:m:ss'"></div>
+			</td>
+			<td>
+				<div ng-bind="item.amount | number : 2"></div>
+			</td>
+			<td>
+				<div ng-show="!item.__edit" ng-bind="item.categoryId || '-'">
+				</div>
+				<div ng-show="item.__edit === true">
+					<select name="category" ng-model="item.categoryId">
+						<option value="salary">Salary</option>
+						<option value="investments">Investments</option>
+						<option value="expenses">Expenses</option>
+					</select>
+				</div>
+			</td>
 			<td>
 				
-				<div ng-show="!item.__edit" ng-click="edit(item)">
-					<button type="button" class="btn btn-success btn-sm">
-						<i class="btn-sm fa fa-edit fa-lg"></i> Edit
+				<div ng-show="!item.__edit">
+					<button type="button" class="btn" ng-click="edit(item)">
+						<i class="fa i-btn fa-edit fa-lg point"></i>
 					</button>
 				</div>
 				<div ng-show="item.__edit === true">
-					<button type="button" class="btn btn-success">Save</button>
+					<button type="button" class="btn" ng-click="save(item)">
+						<i class="fa i-btn fa-save fa-lg point"></i>
+					</button>
 				</div>
 			</td>
 		</tr>
