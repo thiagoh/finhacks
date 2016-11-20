@@ -99,12 +99,12 @@ exports.getGenerateDatabase = (req, res) => {
 
 
 	var user = new User({
-		email: 'user@td.com',
-		password: '123456'
+		email: 'rituyo@dr69.site',
+		password: 'testing123$$'
 	});
 
 	User.findOne({
-		email: 'user@td.com'
+		email: 'rituyo@dr69.site'
 	}, (err, existingUser) => {
 
 		if (err) {
