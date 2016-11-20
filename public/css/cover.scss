@@ -128,6 +128,14 @@ body {
   color: rgba(255,255,255,.5);
 }
 
+.masthead, .mastfoot {
+    z-index: 999;
+}
+
+.mastfoot .inner {
+  min-height: 30px;
+  padding: 2px;
+}
 
 /*
  * Affix and center
@@ -137,10 +145,12 @@ body {
   /* Pull out the header and footer */
   .masthead {
     position: fixed;
+    background-color: #333333;
     top: 0;
   }
   .mastfoot {
     position: fixed;
+    background-color: #333333;
     bottom: 0;
   }
   /* Start the vertical centering */
