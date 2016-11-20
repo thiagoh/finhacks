@@ -37,6 +37,12 @@ cd finhacks
 # Install NPM dependencies
 npm install
 
+# Install NPM dependencies
+npm install bower -g
+
+# Install Bower dependencies
+bower install
+
 # Then simply start your app
 node app.js
 ```
